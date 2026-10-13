@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DIPRR</title>
+<meta name="description" content="DIPRR — Digital Information & Account Passwords Record Register">
+<meta name="theme-color" content="#4f6bed">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="DIPRR">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+  :root { --bg: #f5f6f8; --panel: #fff; --line: #e2e5ea; --text: #1b1f27; --muted: #667085; --accent: #4f6bed; --danger: #d92d20; --ok: #067647; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #0f1115; --panel: #171a21; --line: #2a2f3a; --text: #e7e9ee; --muted: #98a2b3; --accent: #7b90ff; --danger: #f97066; --ok: #47cd89; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); }
+  .wrap { max-width: 520px; margin: 0 auto; padding: 28px 16px 40px; }
+  .hero { text-align: center; margin-bottom: 22px; }
+  .hero img { width: 84px; height: 84px; border-radius: 20px; }
+  h1 { margin: 10px 0 2px; font-size: 26px; }
+  .sub { color: var(--muted); margin: 0; font-size: 14px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px; margin-bottom: 14px; }
+  .card h2 { font-size: 16px; margin: 0 0 6px; }
+  .muted { color: var(--muted); font-size: 13px; }
+  button, .btn { font: inherit; border: 1px solid var(--line); background: var(--panel); color: var(--text); padding: 11px 16px; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; }
+  .primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; width: 100%; font-size: 17px; padding: 14px; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .danger { color: var(--danger); }
+  .pill { display: inline-block; font-size: 12px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+  .pill.on { color: var(--ok); border-color: var(--ok); }
+  input[type=password], input[type=search] { font: inherit; width: 100%; padding: 11px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--text); margin: 10px 0; }
+  #viewer { position: fixed; inset: 0; background: var(--bg); overflow: auto; padding: calc(env(safe-area-inset-top) + 12px) 12px 40px; display: none; }
+  #viewer .bar { display: flex; gap: 8px; position: sticky; top: 0; background: var(--bg); padding-bottom: 8px; z-index: 1; }
+  #viewer .bar input { margin: 0; }
+  .acc, .it { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin: 8px 0; word-break: break-word; }
+  .acc .k { color: var(--muted); font-size: 12px; width: 76px; display: inline-block; }
+  .mono { font-family: ui-monospace, Menlo, Consolas, monospace; }
+  h3 { font-size: 15px; margin: 18px 0 4px; }
+  a { color: var(--accent); }
+  .err { color: var(--danger); min-height: 1.4em; font-size: 14px; }
+  ol { padding-left: 20px; margin: 6px 0 0; } li { margin: 3px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <img src="icon-192.png" alt="">
+    <h1>DIPRR</h1>
+    <p class="sub">Digital Information &amp; Account Passwords Record Register</p>
+  </div>
+
+  <div class="card">
+    <button class="primary" id="openApp">Open DIPRR</button>
+    <p class="muted" id="openHint" style="margin:8px 0 0;text-align:center"></p>
+  </div>
+
+  <div class="card">
+    <h2>Offline pack <span class="pill" id="netPill"></span></h2>
+    <p class="muted" id="packStatus">No offline pack on this device yet.</p>
+    <div class="row">
+      <button id="openPack" hidden>Open offline pack</button>
+      <label class="btn" for="packFile">Load offline pack…</label>
+      <input type="file" id="packFile" accept=".html,text/html" hidden>
+      <button id="removePack" class="danger" hidden>Remove</button>
+    </div>
+    <p class="muted" style="margin-top:10px">Make one in DIPRR → Security → <b>Make offline pack</b>, then load the downloaded file here. It stays encrypted on this device and opens without internet with its passphrase.</p>
+  </div>
+
+  <div class="card" id="installCard">
+    <h2>Put DIPRR on your home screen</h2>
+    <ol class="muted">
+      <li><b>iPhone / iPad (Safari):</b> Share button → <b>Add to Home Screen</b>.</li>
+      <li><b>Android (Chrome):</b> ⋮ menu → <b>Install app</b> or <b>Add to Home screen</b>.</li>
+      <li><b>Computer (Chrome / Edge):</b> install icon at the right of the address bar.</li>
+    </ol>
+    <button id="installBtn" hidden style="margin-top:10px">Install DIPRR</button>
+  </div>
+</div>
+
+<div id="viewer">
+  <div class="bar"><input type="search" id="q" placeholder="Search…" autocomplete="off"><button id="closeViewer">Lock</button></div>
+  <div id="out"></div>
+</div>
+
+<script src="config.js"></script>
+<script>
+'use strict';
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const safe = u => /^https?:\/\//i.test(u || '') ? esc(u) : '#';
+const fromB64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+const APP = (window.DIPRR_APP_URL || '').trim();
+
+// ---- open the online app
+if (/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(APP)) {
+  $('#openApp').addEventListener('click', () => { location.href = APP; });
+  $('#openHint').textContent = 'Opens your private DIPRR (needs internet).';
+} else {
+  $('#openApp').disabled = true;
+  $('#openHint').innerHTML = 'Not linked yet: put your Web app URL in <b>config.js</b>.';
+}
+
+// ---- online / offline badge
+function net() { const on = navigator.onLine; $('#netPill').textContent = on ? 'online' : 'offline'; $('#netPill').className = 'pill' + (on ? '' : ' on'); }
+addEventListener('online', net); addEventListener('offline', net); net();
+
+// ---- install prompt (Android / desktop Chrome)
+let deferred = null;
+addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferred = e; $('#installBtn').hidden = false; });
+$('#installBtn').addEventListener('click', async () => { if (!deferred) return; deferred.prompt(); await deferred.userChoice; deferred = null; $('#installBtn').hidden = true; });
+if (matchMedia('(display-mode: standalone)').matches || navigator.standalone) $('#installCard').hidden = true;
+
+// ---- offline pack storage (IndexedDB; the pack stays encrypted)
+function db() { return new Promise((res, rej) => { const r = indexedDB.open('diprr-launcher', 1); r.onupgradeneeded = () => r.result.createObjectStore('kv'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); }
+async function kv(op, key, val) {
+  const d = await db();
+  return new Promise((res, rej) => {
+    const tx = d.transaction('kv', op === 'get' ? 'readonly' : 'readwrite'), st = tx.objectStore('kv');
+    const r = op === 'get' ? st.get(key) : op === 'del' ? st.delete(key) : st.put(val, key);
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  });
+}
+/** Reads ONLY the encrypted data block from a pack file. The file's own script is never run here. */
+function extract(html) {
+  const m = /\/\*DIPRR-DATA\*\/([\s\S]*?)\/\*END\*\//.exec(html);
+  if (!m) throw new Error('This is not a DIPRR offline pack or locked file.');
+  const D = JSON.parse(m[1]);
+  if (!D.salt || !D.ct || !D.iter) throw new Error('This file is damaged.');
+  return { salt: D.salt, iter: D.iter, ct: D.ct, made: String(D.made || ''), n: Number(D.n) || 0, title: String(D.title || 'DIPRR pack') };
+}
+async function refresh() {
+  const p = await kv('get', 'pack').catch(() => null);
+  $('#openPack').hidden = $('#removePack').hidden = !p;
+  $('#packStatus').textContent = p ? p.title + ' · made ' + p.made + (p.n ? ' · ' + p.n + ' logins' : '') + '. Encrypted on this device.' : 'No offline pack on this device yet.';
+}
+$('#packFile').addEventListener('change', async e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  try { await kv('put', 'pack', extract(await f.text())); await refresh(); alert('Offline pack saved on this device. You can delete the downloaded file now.'); }
+  catch (er) { alert(er.message); }
+});
+$('#removePack').addEventListener('click', async () => { if (confirm('Remove the offline pack from this device?')) { await kv('del', 'pack'); refresh(); } });
+
+// ---- viewer
+let data = null;
+$('#openPack').addEventListener('click', () => {
+  $('#viewer').style.display = 'block';
+  $('#q').hidden = true;
+  $('#out').innerHTML = '<div class="card"><h2>Enter the pack passphrase</h2><form id="pf"><input type="password" id="pp" autocomplete="off" autofocus><button class="primary">Open</button></form><p class="err" id="pe"></p></div>';
+  $('#pf').addEventListener('submit', async ev => {
+    ev.preventDefault(); $('#pe').textContent = 'Opening…';
+    try {
+      const P = await kv('get', 'pack');
+      const base = await crypto.subtle.importKey('raw', new TextEncoder().encode($('#pp').value), 'PBKDF2', false, ['deriveKey']);
+      const key = await crypto.subtle.deriveKey({ name: 'PBKDF2', hash: 'SHA-256', salt: fromB64(P.salt), iterations: P.iter }, base, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
+      const a = fromB64(P.ct);
+      data = JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: a.slice(0, 12), additionalData: new TextEncoder().encode('diprr-export') }, key, a.slice(12))));
+      $('#q').hidden = false; $('#q').value = ''; draw('');
+      lockTimer();
+    } catch (er) { $('#pe').textContent = 'Wrong passphrase.'; }
+  });
+});
+function draw(q) {
+  q = q.toLowerCase(); const hit = s => !q || s.toLowerCase().indexOf(q) !== -1;
+  let h = '';
+  const rows = (data.rows || []).filter(r => hit(r.join(' ')));
+  if (rows.length) {
+    const i = n => data.head.indexOf(n);
+    h += '<h3>Logins (' + rows.length + ')</h3>' + rows.map(r => {
+      const g = n => { const k = i(n); return k === -1 ? '' : r[k]; };
+      const user = g('Username'), pw = g('Password');
+      return '<div class="acc"><b>' + esc(g('Account / service')) + '</b> <span class="muted">' + esc(g('Whose account')) + '</span>' +
+        (g('Login page') ? '<div><a href="' + safe(g('Login page')) + '" target="_blank" rel="noopener noreferrer">' + esc(g('Login page')) + '</a></div>' : '') +
+        (user ? '<div><span class="k">Username</span><span class="mono">' + esc(user) + '</span> <button data-copy="' + esc(user) + '">Copy</button></div>' : '') +
+        (pw ? '<div><span class="k">Password</span><span class="mono" data-pw="' + esc(pw) + '">••••••••</span> <button data-show>Show</button> <button data-copy="' + esc(pw) + '">Copy</button></div>' : '') +
+        (g('Notes') || g('Notes / security questions') ? '<div class="muted" style="white-space:pre-wrap">' + esc(g('Notes') || g('Notes / security questions')) + '</div>' : '') + '</div>';
+    }).join('');
+  }
+  (data.projects || []).forEach(p => {
+    const items = p.items.filter(it => hit([p.name, it.title, it.url, it.content].join(' ')));
+    if (q && !items.length && !hit(p.name)) return;
+    h += '<h3>' + esc(p.name) + '</h3>' + items.map(it => '<div class="it"><b>' + esc(it.title) + '</b> <span class="muted">' + esc(it.type) + (it.file ? ' · ' + esc(it.file) : '') + '</span>' +
+      (it.url ? '<div><a href="' + safe(it.url) + '" target="_blank" rel="noopener noreferrer">' + esc(it.url) + '</a></div>' : '') +
+      (it.content ? '<div class="muted" style="white-space:pre-wrap">' + esc(it.content) + '</div>' : '') + '</div>').join('');
+  });
+  $('#out').innerHTML = h || '<p class="muted">No matches.</p>';
+}
+$('#q').addEventListener('input', e => { draw(e.target.value); lockTimer(); });
+$('#out').addEventListener('click', e => {
+  const c = e.target.closest('[data-copy]'), s = e.target.closest('[data-show]');
+  if (c) { navigator.clipboard && navigator.clipboard.writeText(c.dataset.copy).then(() => { c.textContent = 'Copied'; setTimeout(() => { c.textContent = 'Copy'; try { navigator.clipboard.writeText(''); } catch (er) { } }, 30000); }); }
+  if (s) { const v = s.previousElementSibling; const on = v.textContent !== '••••••••'; v.textContent = on ? '••••••••' : v.dataset.pw; s.textContent = on ? 'Show' : 'Hide'; }
+  lockTimer();
+});
+let lt;
+function lockTimer() { clearTimeout(lt); lt = setTimeout(closeViewer, 3 * 60000); }
+function closeViewer() { data = null; $('#out').innerHTML = ''; $('#viewer').style.display = 'none'; clearTimeout(lt); }
+$('#closeViewer').addEventListener('click', closeViewer);
+document.addEventListener('visibilitychange', () => { if (document.hidden && data) closeViewer(); });
+
+refresh();
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+</body>
+</html>
